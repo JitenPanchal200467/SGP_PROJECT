@@ -1,0 +1,92 @@
+-- -- SQL Migration for Hostel Management System
+
+-- -- 1. Create Hostels Table
+-- CREATE TABLE hostels (
+--     id SERIAL PRIMARY KEY,
+--     name TEXT NOT NULL,
+--     price INTEGER NOT NULL,
+--     rating DECIMAL(3,2),
+--     distance TEXT,
+--     available_rooms INTEGER DEFAULT 0,
+--     total_rooms INTEGER DEFAULT 0,
+--     warden TEXT,
+--     image TEXT,
+--     facilities TEXT[],
+--     description TEXT,
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- 2. Create Users Table
+-- CREATE TABLE users (
+--     id UUID REFERENCES auth.users NOT NULL PRIMARY KEY,
+--     email TEXT UNIQUE NOT NULL,
+--     name TEXT,
+--     role TEXT DEFAULT 'student',
+--     phone TEXT,
+--     college_id TEXT,
+--     hostel_id INTEGER REFERENCES hostels(id) ON DELETE SET NULL,
+--     room_number TEXT,
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- 3. Create Attendance Table
+-- CREATE TABLE attendance (
+--     id SERIAL PRIMARY KEY,
+--     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+--     type TEXT CHECK (type IN ('in', 'out')),
+--     time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- 4. Create Complaints Table
+-- CREATE TABLE complaints (
+--     id SERIAL PRIMARY KEY,
+--     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+--     subject TEXT NOT NULL,
+--     description TEXT NOT NULL,
+--     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'in-progress', 'resolved')),
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- Seed Data (Hostels)
+-- INSERT INTO hostels (name, price, rating, distance, available_rooms, total_rooms, warden, image, facilities, description)
+-- VALUES 
+-- ('Sunrise Hall', 8500, 4.5, '0.3 km', 18, 240, 'Dr. Sharma', '🌅', ARRAY['Wi-Fi', 'AC', 'Gym', 'Laundry'], 'Premium hostel with modern amenities.'),
+-- ('Greenview Residency', 6500, 4.2, '0.5 km', 32, 180, 'Prof. Patel', '🌿', ARRAY['Wi-Fi', 'Laundry', 'Parking'], 'Affordable and well-maintained.'),
+-- ('Skyline Tower', 10000, 4.8, '0.1 km', 5, 160, 'Dr. Mehta', '🏙️', ARRAY['Wi-Fi', 'AC', 'Cafeteria'], 'State-of-the-art high-rise hostel.');
+
+-- -- Enable Row Level Security (Recommended for Supabase)
+-- ALTER TABLE hostels ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE complaints ENABLE ROW LEVEL SECURITY;
+
+-- -- 1. Hostels Policies
+-- CREATE POLICY "Public Read Hostels" ON hostels FOR SELECT USING (true);
+
+-- -- 2. Users Policies
+-- CREATE POLICY "Users can insert their own profile" ON users FOR INSERT WITH CHECK (auth.uid() = id);
+-- CREATE POLICY "Users can view their own profile" ON users FOR SELECT USING (auth.uid() = id);
+-- CREATE POLICY "Users can update their own profile" ON users FOR UPDATE USING (auth.uid() = id);
+
+-- -- 3. Attendance Policies
+-- CREATE POLICY "Users can insert their own attendance" ON attendance FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- CREATE POLICY "Users can view their own attendance" ON attendance FOR SELECT USING (auth.uid() = user_id);
+
+-- -- 4. Complaints Policies
+-- CREATE POLICY "Users can insert their own complaints" ON complaints FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- CREATE POLICY "Users can view their own complaints" ON complaints FOR SELECT USING (auth.uid() = user_id);
+-- CREATE POLICY "Users can update their own complaints" ON complaints FOR UPDATE USING (auth.uid() = user_id);
+
+
+-- -- Allow users to create and view their own profiles
+-- CREATE POLICY "Users can insert their own profile" ON users FOR INSERT WITH CHECK (auth.uid() = id);
+-- CREATE POLICY "Users can view their own profile" ON users FOR SELECT USING (auth.uid() = id);
+-- CREATE POLICY "Users can update their own profile" ON users FOR UPDATE USING (auth.uid() = id);
+
+-- -- Allow users to manage their own attendance logs
+-- CREATE POLICY "Users can insert their own attendance" ON attendance FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- CREATE POLICY "Users can view their own attendance" ON attendance FOR SELECT USING (auth.uid() = user_id);
+
+-- -- Allow users to manage their own complaints
+-- CREATE POLICY "Users can insert their own complaints" ON complaints FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- CREATE POLICY "Users can view their own complaints" ON complaints FOR SELECT USING (auth.uid() = user_id);

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HostelHub — Find, compare, and manage your college hostel accommodation with ease.">
+  <title>HostelHub — Smart Hostel Management</title>
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: var(--gradient-hero);
+      overflow: hidden;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-3xl) var(--space-lg);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 0.4rem 1.2rem;
+      background: rgba(108, 99, 255, 0.12);
+      border: 1px solid rgba(108, 99, 255, 0.25);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      color: var(--primary-light);
+      margin-bottom: var(--space-xl);
+      animation: fadeInDown 0.6s ease;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: var(--space-lg);
+      animation: fadeInUp 0.6s ease;
+      line-height: 1.1;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-2xl);
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .hero-visual {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(108, 99, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108, 99, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    }
+
+    /* Features */
+    .features {
+      padding: var(--space-3xl) 0;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: var(--space-2xl);
+    }
+
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto var(--space-lg);
+      background: var(--gradient-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .feature-card h3 {
+      margin-bottom: var(--space-sm);
+      font-size: 1.2rem;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* How it Works */
+    .steps-section {
+      background: var(--bg-secondary);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-xl);
+      margin-top: var(--space-2xl);
+    }
+
+    .step-card {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+      position: relative;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 0 auto var(--space-lg);
+    }
+
+    .step-card h4 {
+      margin-bottom: var(--space-sm);
+    }
+
+    .step-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .step-connector {
+      display: none;
+    }
+
+    @media (min-width: 769px) {
+      .step-connector {
+        display: block;
+        position: absolute;
+        top: 50px;
+        right: -30px;
+        width: 60px;
+        height: 2px;
+        background: var(--gradient-primary);
+        opacity: 0.4;
+      }
+
+      .step-card:last-child .step-connector {
+        display: none;
+      }
+    }
+
+    /* CTA */
+    .cta-section {
+      padding: var(--space-3xl) 0;
+    }
+
+    .cta-card {
+      text-align: center;
+      padding: var(--space-3xl);
+      background: var(--gradient-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+    }
+
+    .cta-card h2 {
+      margin-bottom: var(--space-md);
+    }
+
+    .cta-card p {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-content">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">🏠</div>
+        <span>Hostel<span class="text-gradient">Hub</span></span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="selection.html">Hostels</a>
+        <a href="quick-access.html">Quick Access</a>
+        <a href="login.html" class="btn btn-primary btn-sm">Sign In</a>
+      </div>
+      <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-visual">
+      <div class="hero-grid"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        📱 Scan. Select. Settle In.
+      </div>
+      <h1>Your Perfect <span class="text-gradient">Hostel</span> Awaits</h1>
+      <p>Scan a QR code to discover, compare, and manage your college accommodation — all in one place. Built for
+        students and parents.</p>
+      <div class="hero-buttons">
+        <a href="selection.html" class="btn btn-primary btn-lg">🔍 Find a Hostel</a>
+        <a href="login.html" class="btn btn-secondary btn-lg">Sign In →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features section">
+    <div class="container">
+      <h2 class="text-center" style="margin-bottom: var(--space-sm);">Everything You Need</h2>
+      <p class="text-center text-muted" style="margin-bottom: var(--space-2xl);">Manage every aspect of hostel life from
+        your phone</p>
+      <div class="grid grid-3">
+        <div class="card feature-card animate-fade-in-up delay-1" style="opacity:0">
+          <div class="feature-icon">📊</div>
+          <h3>Compare Hostels</h3>
+          <p>Side-by-side comparison of facilities, pricing, mess quality, and reviews to find your perfect match.</p>
+        </div>
+        <div class="card feature-card animate-fade-in-up delay-2" style="opacity:0">
+          <div class="feature-icon">📍</div>
+          <h3>Live Tracking</h3>
+          <p>Parents can track student check-in/out status in real-time with instant notifications.</p>
+        </div>
+        <div class="card feature-card animate-fade-in-up delay-3" style="opacity:0">
+          <div class="feature-icon">🍽️</div>
+          <h3>Mess Management</h3>
+          <p>View breakfast, lunch & dinner menus. Check today's special and meal timings at a glance.</p>
+        </div>
+        <div class="card feature-card animate-fade-in-up delay-4" style="opacity:0">
+          <div class="feature-icon">🔔</div>
+          <h3>Smart Notifications</h3>
+          <p>Get alerts for attendance changes, mess updates, maintenance, and important announcements.</p>
+        </div>
+        <div class="card feature-card animate-fade-in-up delay-4" style="opacity:0">
+          <div class="feature-icon">🛠️</div>
+          <h3>Complaint System</h3>
+          <p>Submit and track maintenance requests and complaints with real-time status updates.</p>
+        </div>
+        <div class="card feature-card animate-fade-in-up delay-5" style="opacity:0">
+          <div class="feature-icon">⚡</div>
+          <h3>Quick Access</h3>
+          <p>Returning users skip the selection — jump straight to your dashboard with one tap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="steps-section section">
+    <div class="container">
+      <h2 class="text-center" style="margin-bottom: var(--space-sm);">How It Works</h2>
+      <p class="text-center text-muted">Three simple steps to get started</p>
+      <div class="steps-grid">
+        <div class="card step-card">
+          <div class="step-number">1</div>
+          <div class="step-connector"></div>
+          <h4>Scan QR Code</h4>
+          <p>Scan the QR code at your college to land on the hostel portal instantly.</p>
+        </div>
+        <div class="card step-card">
+          <div class="step-number">2</div>
+          <div class="step-connector"></div>
+          <h4>Browse & Compare</h4>
+          <p>Explore available hostels, compare facilities side-by-side, and pick your favourite.</p>
+        </div>
+        <div class="card step-card">
+          <div class="step-number">3</div>
+          <h4>Sign Up & Manage</h4>
+          <p>Create an account and access your personalised dashboard for daily hostel management.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card animate-glow">
+        <h2>Ready to Get <span class="text-gradient">Started</span>?</h2>
+        <p>Join hundreds of students and parents already using HostelHub for a seamless hostel experience.</p>
+        <div class="hero-buttons">
+          <a href="selection.html" class="btn btn-primary btn-lg">Explore Hostels</a>
+          <a href="register.html" class="btn btn-outline btn-lg">Create Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 HostelHub. Crafted for smart campus living.</p>
+    </div>
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-fade-in-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+
+</html>

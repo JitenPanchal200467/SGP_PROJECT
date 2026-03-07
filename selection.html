@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <meta name="description" content="Browse and compare premium student hostels on HostelHub.">
+    <meta property="og:title" content="Browse Hostels — HostelHub">
+    <meta property="og:description" content="Find verified hostels, compare amenities, and book your ideal room.">
+    <title>Browse Hostels — HostelHub</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        /* ---- Page Header ---- */
+        .page-header {
+            padding: 120px 0 40px;
+            text-align: center;
+            background: var(--gradient-hero);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header h1 {
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* ---- Hostel Grid ---- */
+        .hostel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: var(--space-xl);
+            padding: var(--space-3xl) 0;
+        }
+
+        /* ---- Hostel Card ---- */
+        .hostel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: box-shadow var(--transition-base), transform var(--transition-base), border-color var(--transition-base);
+        }
+
+        .hostel-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .hostel-card-img {
+            position: relative;
+            height: 210px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        .hostel-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .hostel-card:hover .hostel-card-img img {
+            transform: scale(1.04);
+        }
+
+        .hostel-card-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .hbadge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+        }
+
+        .hbadge-warn {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .hbadge-info {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* ---- Card Body ---- */
+        .hostel-card-body {
+            padding: var(--space-lg);
+        }
+
+        .hostel-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .hostel-card-top h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+        }
+
+        .hostel-meta-row {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .hostel-meta-row .dot {
+            color: var(--border-hover);
+        }
+
+        .hostel-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .price-num {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .price-mo {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .hostel-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin: var(--space-sm) 0 var(--space-md);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hostel-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: var(--space-md);
+        }
+
+        .htag {
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 3px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+        }
+
+        .hostel-card-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .hostel-card-actions .btn {
+            flex: 1;
+        }
+
+        /* ---- Compare Bar ---- */
+        .compare-bar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: var(--z-sticky);
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-md) var(--space-xl);
+            box-shadow: var(--shadow-lg);
+            transition: bottom var(--transition-base);
+            max-width: 700px;
+            width: 90%;
+        }
+
+        .compare-bar.visible {
+            bottom: 24px;
+        }
+
+        .compare-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+
+        .compare-bar-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        @media (max-width: 768px) {
+            .hostel-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-bar-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">🏠</div>
+                <span>Hostel<span class="text-gradient">Hub</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="selection.html" class="active">Hostels</a>
+                <a href="login.html" class="btn btn-primary btn-sm">Sign In</a>
+            </div>
+            <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header reveal">
+        <div class="container">
+            <h1>Browse <span class="text-gradient">Premium Hostels</span></h1>
+            <p>Select your perfect stay from our curated collection of verified student homes.</p>
+        </div>
+    </div>
+
+    <section class="section" style="padding-top: 0;">
+        <div class="container">
+            <div class="hostel-grid" id="hostelGrid">
+                <!-- Rendered by selection.js -->
+            </div>
+        </div>
+    </section>
+
+    <div class="compare-bar" id="compareBar"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 HostelHub. Crafted for smart campus living.</p>
+        </div>
+    </footer>
+
+    <!-- Supabase & App Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/config.js" type="module"></script>
+    <script src="js/supabase.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/selection.js" defer></script>
+</body>
+
+</html>

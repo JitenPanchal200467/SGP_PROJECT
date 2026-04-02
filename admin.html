@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+  <title>HostelHub — Hostel Admin Portal</title>
+  <meta name="description" content="Hostel Admin Portal — Manage appointments, complaints, and reviews for your hostel.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/index.css">
+
+  <style>
+    /* ===== Admin Page Specific Styles ===== */
+    body { overflow-x: hidden; }
+
+    /* Login Screen */
+    .admin-login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      background-image:
+        radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 70%, rgba(6,182,212,0.09) 0%, transparent 50%);
+      padding: 2rem;
+    }
+
+    .admin-login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-xl);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .admin-login-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .admin-login-logo .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .admin-login-logo span { font-size: 1.4rem; font-weight: 800; }
+
+    .admin-login-card h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .admin-login-card .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.75rem;
+    }
+
+    .login-error {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #FCA5A5;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .login-error.show { display: block; }
+
+    /* Dashboard */
+    .admin-dashboard { display: none; min-height: 100vh; }
+    .admin-dashboard.visible { display: block; }
+
+    /* Top bar */
+    .admin-topbar {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 0;
+    }
+    .admin-topbar-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .admin-topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .admin-hostel-pill {
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: var(--radius-full);
+      padding: 0.3rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary-light);
+    }
+
+    /* Stats row */
+    .admin-stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .stat-icon {
+      width: 46px; height: 46px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .stat-icon.blue { background: rgba(99,102,241,0.15); }
+    .stat-icon.cyan { background: rgba(6,182,212,0.15); }
+    .stat-icon.amber { background: rgba(245,158,11,0.15); }
+    .stat-icon.green { background: rgba(16,185,129,0.15); }
+    .stat-num { font-size: 1.75rem; font-weight: 800; line-height: 1; }
+    .stat-lbl { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Tab nav */
+    .admin-tabs {
+      display: flex; gap: 0.25rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+    }
+    .admin-tab {
+      padding: 0.55rem 1.25rem;
+      border-radius: var(--radius-sm);
+      border: none; background: none;
+      color: var(--text-secondary);
+      font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .admin-tab:hover { color: var(--text-primary); }
+    .admin-tab.active { background: var(--gradient-primary); color: #fff; }
+
+    /* Panels */
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    /* Table */
+    .admin-table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .admin-table-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .admin-table-header h3 { font-size: 1rem; font-weight: 600; }
+
+    .admin-search {
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      width: 220px;
+      transition: border-color 0.2s;
+    }
+    .admin-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg-secondary); }
+    th {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted);
+      text-align: left;
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.9rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    .tbl-name { font-weight: 600; color: var(--text-primary); }
+    .tbl-email { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 0.2rem 0.7rem;
+      border-radius: var(--radius-full);
+      font-size: 0.73rem; font-weight: 600;
+    }
+    .status-badge.pending  { background: rgba(245,158,11,0.15); color: #FCD34D; }
+    .status-badge.confirmed{ background: rgba(16,185,129,0.15); color: #6EE7B7; }
+    .status-badge.cancelled{ background: rgba(239,68,68,0.15); color: #FCA5A5; }
+    .status-badge.open     { background: rgba(59,130,246,0.15); color: #93C5FD; }
+    .status-badge.resolved { background: rgba(16,185,129,0.15); color: #6EE7B7; }
+
+    /* Action buttons in table */
+    .tbl-actions { display: flex; gap: 0.4rem; align-items: center; }
+    .tbl-btn {
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 0.75rem; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tbl-btn-confirm { background: rgba(16,185,129,0.15); color: #6EE7B7; border: 1px solid rgba(16,185,129,0.3); }
+    .tbl-btn-confirm:hover { background: rgba(16,185,129,0.25); }
+    .tbl-btn-cancel  { background: rgba(239,68,68,0.12); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.25); }
+    .tbl-btn-cancel:hover  { background: rgba(239,68,68,0.2); }
+    .tbl-btn-resolve { background: rgba(99,102,241,0.12); color: var(--primary-light); border: 1px solid rgba(99,102,241,0.25); }
+    .tbl-btn-resolve:hover { background: rgba(99,102,241,0.22); }
+
+    /* Review cards */
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .review-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .review-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .review-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .review-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; color: #fff;
+      flex-shrink: 0;
+    }
+    .review-stars { color: #FCD34D; font-size: 0.85rem; }
+    .review-text { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
+    .review-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.6rem; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* Filter select */
+    .admin-select {
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      appearance: none;
+      padding-right: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.859 0 1.319 1.013.753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin-login-card { padding: 1.75rem; }
+      .stat-card { padding: 1rem; }
+      th, td { padding: 0.6rem 0.8rem; }
+      .admin-search { width: 160px; }
+    }
+
+    /* Page wrapper */
+    .admin-page-wrap { max-width: 1280px; margin: 0 auto; padding: 1.75rem 1.5rem; }
+  </style>
+</head>
+
+<body>
+
+<!-- ========== LOGIN SCREEN ========== -->
+<div class="admin-login-wrap" id="loginScreen">
+  <div class="admin-login-card">
+    <div class="admin-login-logo">
+      <div class="logo-icon">🏠</div>
+      <span>Hostel<span class="text-gradient">Hub</span> <span style="font-weight:400;color:var(--text-muted);font-size:1rem;">Admin</span></span>
+    </div>
+    <h1>Hostel Admin Login</h1>
+    <p class="subtitle">Sign in with your hostel credentials to manage your dashboard.</p>
+
+    <div class="login-error" id="loginError">❌ Invalid hostel ID or password. Please try again.</div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label" for="hostelSelect">Select Your Hostel</label>
+        <select class="form-input" id="hostelSelect" required>
+          <option value="">— Choose a hostel —</option>
+          <option value="1001">Sahajanand Hostel</option>
+          <option value="1002">Royal Care</option>
+          <option value="1003">Shreedeep Residency</option>
+          <option value="1004">Nisarg Hostel</option>
+          <option value="1005">Darshan Residency</option>
+          <option value="1006">Prince Hostel</option>
+          <option value="1007">Om Residency</option>
+          <option value="1008">Patel Hostel</option>
+          <option value="1009">Aashirwad Residency</option>
+          <option value="1010">Pramukh Preet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="adminPassword">Password</label>
+        <input class="form-input" type="password" id="adminPassword" placeholder="Enter your admin password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">🔐 Sign In</button>
+    </form>
+
+    <div style="margin-top:1.25rem;padding:1rem;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);border-radius:var(--radius-md);font-size:0.8rem;color:var(--text-muted);">
+      <strong style="color:var(--accent-light);">Default credentials:</strong><br>
+      Password = <code style="color:var(--primary-light);">hostelname@admin</code> (e.g. <code style="color:var(--primary-light);">sahajanand@admin</code>)
+    </div>
+
+    <p style="text-align:center;margin-top:1.25rem;font-size:0.83rem;color:var(--text-muted);">
+      <a href="index.html" style="color:var(--primary-light);">← Back to HostelHub</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========== DASHBOARD ========== -->
+<div class="admin-dashboard" id="adminDashboard">
+
+  <!-- Topbar -->
+  <div class="admin-topbar">
+    <div class="admin-topbar-inner">
+      <div class="admin-topbar-left">
+        <a href="index.html" class="nav-logo" style="font-size:1.1rem;text-decoration:none;color:var(--text-primary);">
+          <div class="logo-icon" style="width:32px;height:32px;font-size:0.9rem;">🏠</div>
+          <span>Hostel<span class="text-gradient">Hub</span></span>
+        </a>
+        <span class="admin-hostel-pill" id="topbarHostelName">—</span>
+        <span class="admin-hostel-pill" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.2);color:#FCA5A5;">Admin</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-page-wrap">
+
+    <!-- Stats -->
+    <div class="admin-stats-row" id="statsRow"></div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="tab-appointments" onclick="switchTab('appointments')">📅 Appointments</button>
+      <button class="admin-tab" id="tab-complaints" onclick="switchTab('complaints')">🔔 Complaints</button>
+      <button class="admin-tab" id="tab-reviews" onclick="switchTab('reviews')">⭐ Reviews</button>
+    </div>
+
+    <!-- ---- Appointments Panel ---- -->
+    <div class="admin-panel active" id="panel-appointments">
+      <div class="admin-table-wrap">
+        <div class="admin-table-header">
+          <h3>📅 Appointment Requests</h3>
+          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+            <select class="admin-select" id="apptFilter" onchange="renderAppointmentsTable()">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input class="admin-search" type="text" id="apptSearch" placeholder="🔍  Search student…" oninput="renderAppointmentsTable()">
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="apptTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Room Type</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="apptBody"></tbody>
+          </table>
+          <div class="empty-state" id="apptEmpty" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <p>No appointment requests found.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- Complaints Panel ---- -->
+    <div class="admin-panel" id="panel-complaints">
+      <div class="admin-table-wrap">
+        <div class="admin-table-header">
+          <h3>🔔 Complaints & Maintenance</h3>
+          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+            <select class="admin-select" id="complaintFilter" onchange="renderComplaintsTable()">
+              <option value="all">All Status</option>
+              <option value="open">Open</option>
+              <option value="resolved">Resolved</option>
+            </select>
+            <input class="admin-search" type="text" id="complaintSearch" placeholder="🔍  Search…" oninput="renderComplaintsTable()">
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="complaintTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="complaintBody"></tbody>
+          </table>
+          <div class="empty-state" id="complaintEmpty" style="display:none;">
+            <div class="empty-icon">✅</div>
+            <p>No complaints on record.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- Reviews Panel ---- -->
+    <div class="admin-panel" id="panel-reviews">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
+        <h3 style="font-size:1rem;font-weight:600;">⭐ Student Reviews</h3>
+        <div id="reviewAvgBadge" style="font-size:0.88rem;color:var(--text-secondary);"></div>
+      </div>
+      <div class="reviews-grid" id="reviewsGrid"></div>
+      <div class="empty-state" id="reviewsEmpty" style="display:none;">
+        <div class="empty-icon">💬</div>
+        <p>No reviews yet for this hostel.</p>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+</div><!-- /dashboard -->
+
+<script>
+// ============================================================
+// Admin Credentials — password = hostelname@admin (lowercase)
+// ============================================================
+const HOSTEL_CREDENTIALS = {
+  '1001': { name: 'Sahajanand Hostel',   password: 'sahajanand@admin' },
+  '1002': { name: 'Royal Care',          password: 'royalcare@admin'  },
+  '1003': { name: 'Shreedeep Residency', password: 'shreedeep@admin'  },
+  '1004': { name: 'Nisarg Hostel',       password: 'nisarg@admin'     },
+  '1005': { name: 'Darshan Residency',   password: 'darshan@admin'    },
+  '1006': { name: 'Prince Hostel',       password: 'prince@admin'     },
+  '1007': { name: 'Om Residency',        password: 'om@admin'         },
+  '1008': { name: 'Patel Hostel',        password: 'patel@admin'      },
+  '1009': { name: 'Aashirwad Residency', password: 'aashirwad@admin'  },
+  '1010': { name: 'Pramukh Preet',       password: 'pramukh@admin'    },
+};
+
+let currentHostelId = null;
+
+// ============================================================
+// Session – check if already logged in
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('adminSession');
+  if (saved) {
+    const { hostelId } = JSON.parse(saved);
+    showDashboard(hostelId);
+  }
+  seedDemoData();
+});
+
+// ============================================================
+// Login / Logout
+// ============================================================
+function handleLogin(e) {
+  e.preventDefault();
+  const hostelId = document.getElementById('hostelSelect').value;
+  const password = document.getElementById('adminPassword').value.trim();
+  const cred     = HOSTEL_CREDENTIALS[hostelId];
+
+  const err = document.getElementById('loginError');
+  if (!cred || password !== cred.password) {
+    err.classList.add('show');
+    document.getElementById('adminPassword').value = '';
+    return;
+  }
+  err.classList.remove('show');
+  sessionStorage.setItem('adminSession', JSON.stringify({ hostelId }));
+  showDashboard(hostelId);
+}
+
+function handleLogout() {
+  sessionStorage.removeItem('adminSession');
+  document.getElementById('adminDashboard').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('hostelSelect').value = '';
+}
+
+// ============================================================
+// Show Dashboard
+// ============================================================
+function showDashboard(hostelId) {
+  currentHostelId = hostelId;
+  const cred = HOSTEL_CREDENTIALS[hostelId];
+
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminDashboard').classList.add('visible');
+  document.getElementById('topbarHostelName').textContent = cred.name;
+  document.title = `${cred.name} — Admin | HostelHub`;
+
+  renderStats();
+  renderAppointmentsTable();
+  renderComplaintsTable();
+  renderReviews();
+}
+
+// ============================================================
+// Demo Data Seed (localStorage) — runs once
+// ============================================================
+function seedDemoData() {
+  if (localStorage.getItem('adminDataSeeded')) return;
+
+  const names = ['Aarav Sharma','Priya Patel','Rahul Verma','Anaya Joshi','Kiran Mehta',
+                  'Sanya Singh','Dev Chauhan','Pooja Rao','Rohan Nair','Meera Gupta',
+                  'Aryan Shah','Tanvi Desai','Vivek Kumar','Nisha Tiwari','Harsh Trivedi'];
+  const roomTypes = ['3-Sharing AC','4-Sharing AC','3-Sharing Non-AC','2-Sharing AC'];
+  const times = ['10:00 AM','11:30 AM','2:00 PM','3:30 PM','4:00 PM','5:00 PM'];
+  const statuses = ['pending','pending','pending','confirmed','confirmed','cancelled'];
+  const categories = ['Maintenance','Cleanliness','WiFi Issue','Food Quality','Water Supply','Other'];
+  const complaintDescs = [
+    'The ceiling fan in my room is making a loud noise.',
+    'Washroom was not cleaned for 3 days.',
+    'WiFi disconnects every few hours in Room 204.',
+    'Mess food quality has degraded significantly.',
+    'No hot water available in the morning.',
+    'Room door lock is broken.',
+  ];
+  const reviews  = [
+    { stars:5, text:'Excellent facilities and very clean rooms. The warden is supportive and responsive.' },
+    { stars:4, text:'Good place to stay. Mess food is decent and WiFi is reliable most of the time.' },
+    { stars:5, text:'Best hostel I could have chosen. The study room is amazing and very quiet.' },
+    { stars:3, text:'Average experience. The maintenance team takes too long to respond.' },
+    { stars:4, text:'Comfortable rooms and friendly atmosphere. Would recommend to friends.' },
+    { stars:5, text:'The gym and common areas are well maintained. Good security overall.' },
+  ];
+
+  const seeded = { appointments: {}, complaints: {}, reviews: {} };
+
+  Object.keys(HOSTEL_CREDENTIALS).forEach(hid => {
+    seeded.appointments[hid] = Array.from({length: 6}, (_, i) => ({
+      id: Date.now() + Math.random(),
+      name: names[i % names.length],
+      email: `student${i}@college.edu`,
+      phone: `98${Math.floor(10000000 + Math.random()*89999999)}`,
+      roomType: roomTypes[i % roomTypes.length],
+      date: new Date(Date.now() + (i - 2) * 86400000).toLocaleDateString('en-IN'),
+      time: times[i % times.length],
+      status: statuses[i % statuses.length],
+      message: 'Interested in discussing room availability and facilities.',
+    }));
+
+    seeded.complaints[hid] = Array.from({length: 4}, (_, i) => ({
+      id: Date.now() + Math.random(),
+      name: names[(i + 7) % names.length],
+      email: `student${i+10}@college.edu`,
+      category: categories[i % categories.length],
+      description: complaintDescs[i % complaintDescs.length],
+      date: new Date(Date.now() - i * 2 * 86400000).toLocaleDateString('en-IN'),
+      status: i > 2 ? 'resolved' : 'open',
+    }));
+
+    seeded.reviews[hid] = reviews.slice(0, 4).map((r, i) => ({
+      ...r,
+      id: Date.now() + Math.random(),
+      name: names[(i + 5) % names.length],
+      date: new Date(Date.now() - i * 5 * 86400000).toLocaleDateString('en-IN'),
+    }));
+  });
+
+  localStorage.setItem('hostelAdminData', JSON.stringify(seeded));
+  localStorage.setItem('adminDataSeeded', '1');
+}
+
+// ============================================================
+// Helpers to read/write data
+// ============================================================
+function getData() {
+  return JSON.parse(localStorage.getItem('hostelAdminData') || '{"appointments":{},"complaints":{},"reviews":{}}');
+}
+function saveData(data) {
+  localStorage.setItem('hostelAdminData', JSON.stringify(data));
+}
+
+function getAppointments(hid) {
+  return (getData().appointments[hid] || []);
+}
+function getComplaints(hid) {
+  return (getData().complaints[hid] || []);
+}
+function getReviews(hid) {
+  // Merge locally stored reviews + any stored from the public complaints page
+  const local = (getData().reviews[hid] || []);
+  const stored = JSON.parse(localStorage.getItem('hostelHub_reviews') || '[]');
+  const hostelName = HOSTEL_CREDENTIALS[hid]?.name;
+  const publicRevs = stored.filter(r => r.hostel_name === hostelName);
+  return [...local, ...publicRevs];
+}
+
+// ============================================================
+// Stats
+// ============================================================
+function renderStats() {
+  const appts     = getAppointments(currentHostelId);
+  const complaints= getComplaints(currentHostelId);
+  const reviews   = getReviews(currentHostelId);
+  const pending   = appts.filter(a => a.status === 'pending').length;
+  const open      = complaints.filter(c => c.status === 'open').length;
+  const avgRating = reviews.length
+    ? (reviews.reduce((s, r) => s + (r.stars || r.rating || 0), 0) / reviews.length).toFixed(1)
+    : '—';
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon blue">📅</div>
+      <div><div class="stat-num">${appts.length}</div><div class="stat-lbl">Total Appointments</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">⏳</div>
+      <div><div class="stat-num">${pending}</div><div class="stat-lbl">Pending Appointments</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon cyan">🔔</div>
+      <div><div class="stat-num">${open}</div><div class="stat-lbl">Open Complaints</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">⭐</div>
+      <div><div class="stat-num">${avgRating}</div><div class="stat-lbl">Avg Rating (${reviews.length} reviews)</div></div>
+    </div>
+  `;
+}
+
+// ============================================================
+// Tabs
+// ============================================================
+function switchTab(name) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ============================================================
+// Appointments Table
+// ============================================================
+function renderAppointmentsTable() {
+  const filter  = (document.getElementById('apptFilter')?.value || 'all');
+  const query   = (document.getElementById('apptSearch')?.value || '').toLowerCase();
+  let appts = getAppointments(currentHostelId);
+
+  if (filter !== 'all') appts = appts.filter(a => a.status === filter);
+  if (query)            appts = appts.filter(a => a.name.toLowerCase().includes(query) || a.email.toLowerCase().includes(query));
+
+  const body  = document.getElementById('apptBody');
+  const empty = document.getElementById('apptEmpty');
+
+  if (!appts.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = appts.map((a, i) => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:0.8rem;">${String(i + 1).padStart(2,'0')}</td>
+      <td>
+        <div class="tbl-name">${a.name}</div>
+        <div class="tbl-email">${a.email} · ${a.phone || ''}</div>
+      </td>
+      <td>${a.roomType}</td>
+      <td>${a.date}</td>
+      <td>${a.time}</td>
+      <td><span class="status-badge ${a.status}">● ${capitalize(a.status)}</span></td>
+      <td>
+        <div class="tbl-actions">
+          ${a.status === 'pending' ? `
+            <button class="tbl-btn tbl-btn-confirm" onclick="updateAppt('${a.id}','confirmed')">Confirm</button>
+            <button class="tbl-btn tbl-btn-cancel"  onclick="updateAppt('${a.id}','cancelled')">Cancel</button>
+          ` : a.status === 'confirmed' ? `
+            <button class="tbl-btn tbl-btn-cancel" onclick="updateAppt('${a.id}','cancelled')">Cancel</button>
+          ` : '<span style="color:var(--text-muted);font-size:0.78rem;">—</span>'}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateAppt(id, status) {
+  const data  = getData();
+  const appts = data.appointments[currentHostelId] || [];
+  const idx   = appts.findIndex(a => String(a.id) === String(id));
+  if (idx !== -1) appts[idx].status = status;
+  data.appointments[currentHostelId] = appts;
+  saveData(data);
+  renderAppointmentsTable();
+  renderStats();
+}
+
+// ============================================================
+// Complaints Table
+// ============================================================
+function renderComplaintsTable() {
+  const filter    = (document.getElementById('complaintFilter')?.value || 'all');
+  const query     = (document.getElementById('complaintSearch')?.value || '').toLowerCase();
+  let complaints  = getComplaints(currentHostelId);
+
+  // Also pull in localStorage complaints from public form
+  const stored = JSON.parse(localStorage.getItem('hostelHub_complaints') || '[]');
+  const hostelName = HOSTEL_CREDENTIALS[currentHostelId]?.name;
+  const publicCmpl = stored.filter(c => c.hostel_name === hostelName).map(c => ({
+    id: c.id || c.timestamp || Math.random(),
+    name: c.student_name || c.name || 'Unknown',
+    email: c.email || '—',
+    category: c.category || 'Other',
+    description: c.description || c.text || '—',
+    date: c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN') : (c.date || '—'),
+    status: c.status || 'open',
+  }));
+  complaints = [...complaints, ...publicCmpl];
+
+  if (filter !== 'all') complaints = complaints.filter(c => c.status === filter);
+  if (query)            complaints = complaints.filter(c => c.name.toLowerCase().includes(query) || c.description.toLowerCase().includes(query));
+
+  const body  = document.getElementById('complaintBody');
+  const empty = document.getElementById('complaintEmpty');
+
+  if (!complaints.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = complaints.map((c, i) => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:0.8rem;">${String(i + 1).padStart(2,'0')}</td>
+      <td>
+        <div class="tbl-name">${c.name}</div>
+        <div class="tbl-email">${c.email}</div>
+      </td>
+      <td><span class="htag" style="background:rgba(99,102,241,0.1);color:var(--primary-light);border-radius:4px;padding:2px 8px;font-size:0.75rem;">${c.category}</span></td>
+      <td style="max-width:240px;white-space:normal;">${c.description}</td>
+      <td>${c.date}</td>
+      <td><span class="status-badge ${c.status}">● ${c.status === 'open' ? 'Open' : 'Resolved'}</span></td>
+      <td>
+        ${c.status === 'open'
+          ? `<button class="tbl-btn tbl-btn-resolve" onclick="resolveComplaint('${c.id}')">Mark Resolved</button>`
+          : '<span style="color:var(--text-muted);font-size:0.78rem;">—</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function resolveComplaint(id) {
+  const data       = getData();
+  const complaints = data.complaints[currentHostelId] || [];
+  const idx        = complaints.findIndex(c => String(c.id) === String(id));
+  if (idx !== -1) { complaints[idx].status = 'resolved'; data.complaints[currentHostelId] = complaints; saveData(data); }
+  renderComplaintsTable();
+  renderStats();
+}
+
+// ============================================================
+// Reviews
+// ============================================================
+function renderReviews() {
+  const reviews = getReviews(currentHostelId);
+  const grid    = document.getElementById('reviewsGrid');
+  const empty   = document.getElementById('reviewsEmpty');
+  const avg     = document.getElementById('reviewAvgBadge');
+
+  if (!reviews.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    avg.textContent = '';
+    return;
+  }
+  empty.style.display = 'none';
+  const avgVal = (reviews.reduce((s, r) => s + (r.stars || r.rating || 0), 0) / reviews.length).toFixed(1);
+  avg.innerHTML = `⭐ Average: <strong style="color:var(--text-primary);">${avgVal}</strong> / 5 &nbsp;·&nbsp; ${reviews.length} reviews`;
+
+  grid.innerHTML = reviews.map(r => {
+    const initials = (r.name || '?').split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+    const stars    = r.stars || r.rating || 0;
+    return `
+      <div class="review-card">
+        <div class="review-card-header">
+          <div class="review-avatar">${initials}</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;color:var(--text-primary);">${r.name}</div>
+            <div class="review-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>
+          </div>
+        </div>
+        <p class="review-text">${r.text || r.comment || '—'}</p>
+        <div class="review-date">${r.date || '—'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// Utility
+// ============================================================
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ''; }
+</script>
+
+</body>
+</html>

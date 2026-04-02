@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <meta name="description" content="Sign in to complete your hostel booking on HostelHub.">
+    <title>Sign In to Book — HostelHub</title>
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px var(--space-lg) var(--space-3xl);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .auth-header .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #06B6D4 0%, #10B981 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto var(--space-lg);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.35);
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Booking context banner */
+        .booking-context {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .booking-context .hostel-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .booking-context .booking-text {
+            flex: 1;
+        }
+
+        .booking-context .booking-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .booking-context .booking-hostel-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .booking-context .booking-price-tag {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .auth-card {
+            padding: var(--space-2xl);
+        }
+
+        /* Tabs for Login / Register */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: var(--space-xl);
+            gap: 0;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.65rem var(--space-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+        }
+
+        .auth-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .auth-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .auth-panel {
+            display: none;
+        }
+
+        .auth-panel.active {
+            display: block;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+        }
+
+        .role-option input {
+            display: none;
+        }
+
+        .role-option label {
+            display: block;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background: var(--bg-glass);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .role-option input:checked+label {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.08);
+            color: var(--accent);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            font-size: 0.9rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, #06B6D4 0%, #10B981 100%);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.45);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: var(--space-md);
+        }
+
+        .secure-note span {
+            color: var(--accent);
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">🏠</div>
+                <span>Hostel<span class="text-gradient">Hub</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="selection.html">Hostels</a>
+                <a href="login.html" class="btn btn-secondary btn-sm">Dashboard Login</a>
+            </div>
+            <div class="nav-toggle" id="navToggle" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-page">
+        <div class="auth-container">
+
+            <div class="auth-header">
+                <div class="logo-icon">🏨</div>
+                <h1>Almost There!</h1>
+                <p>Sign in or create an account to complete your booking</p>
+            </div>
+
+            <!-- Hostel context banner — populated by JS -->
+            <div class="booking-context" id="bookingContext" style="display:none;">
+                <div class="hostel-icon">🏢</div>
+                <div class="booking-text">
+                    <div class="booking-label">Completing booking for</div>
+                    <div class="booking-hostel-name" id="ctxHostelName">—</div>
+                    <div class="booking-price-tag" id="ctxHostelPrice">—</div>
+                    <div class="booking-price-tag" id="ctxRoomType" style="color:var(--text-muted);"></div>
+                </div>
+            </div>
+
+            <div class="card auth-card">
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+                    <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+                </div>
+
+                <!-- LOGIN PANEL -->
+                <div class="auth-panel active" id="panelLogin">
+                    <form id="loginFormBooking">
+                        <div class="role-selector">
+                            <div class="role-option">
+                                <input type="radio" name="loginRoleBook" id="roleStudentBook" value="student" checked>
+                                <label for="roleStudentBook">🎓 Student</label>
+                            </div>
+                            <div class="role-option">
+                                <input type="radio" name="loginRoleBook" id="roleParentBook" value="parent">
+                                <label for="roleParentBook">👨‍👩‍👧 Parent</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="bookLoginEmail">Email Address</label>
+                            <input type="email" class="form-input" id="bookLoginEmail" placeholder="you@college.edu"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="bookLoginPassword">Password</label>
+                            <input type="password" class="form-input" id="bookLoginPassword"
+                                placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="form-footer">
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Remember me
+                            </label>
+                            <a href="#" style="color: var(--accent); font-size: 0.9rem;">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-book btn-lg" id="loginBookBtn"
+                            style="width: 100%;">Sign In &amp; Complete Booking →</button>
+                        <div class="secure-note"><span>🔒</span> Secured by Supabase Auth</div>
+                    </form>
+                </div>
+
+                <!-- REGISTER PANEL -->
+                <div class="auth-panel" id="panelRegister">
+                    <form id="registerFormBooking">
+                        <div class="form-group">
+                            <label class="form-label" for="bRegName">Full Name</label>
+                            <input type="text" class="form-input" id="bRegName" placeholder="Enter your full name"
+                                required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="bRegEmail">Email Address</label>
+                                <input type="email" class="form-input" id="bRegEmail" placeholder="you@college.edu"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bRegPhone">Phone Number</label>
+                                <input type="tel" class="form-input" id="bRegPhone" placeholder="+91 98765 43210"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="bRegRole">I am a</label>
+                                <select class="form-input" id="bRegRole">
+                                    <option value="student">🎓 Student</option>
+                                    <option value="parent">👨‍👩‍👧 Parent</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bRegCollegeId">College / PRN ID</label>
+                                <input type="text" class="form-input" id="bRegCollegeId" placeholder="STU2026001">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="bRegPassword">Password</label>
+                                <input type="password" class="form-input" id="bRegPassword"
+                                    placeholder="Min 6 characters" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bRegConfirm">Confirm Password</label>
+                                <input type="password" class="form-input" id="bRegConfirm"
+                                    placeholder="Re-enter password" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-book btn-lg" id="registerBookBtn"
+                            style="width: 100%; margin-top: var(--space-md);">Create Account &amp; Book →</button>
+                        <div class="secure-note"><span>🔒</span> Secured by Supabase Auth</div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="js/config.js" type="module"></script>
+    <script src="js/supabase.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/auth-booking.js" defer></script>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+        }
+
+        // Show hostel context from sessionStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = sessionStorage.getItem('selectedHostel');
+            if (stored) {
+                try {
+                    const h = JSON.parse(stored);
+                    document.getElementById('bookingContext').style.display = 'flex';
+                    document.getElementById('ctxHostelName').textContent = h.name || '—';
+                    // Show selected room type + price if available
+                    if (h.selectedRoomType && h.price) {
+                        document.getElementById('ctxHostelPrice').textContent =
+                            `₹${Number(h.price).toLocaleString()} / month`;
+                        document.getElementById('ctxRoomType').textContent =
+                            `Room type: ${h.selectedRoomType}`;
+                    } else if (h.price) {
+                        document.getElementById('ctxHostelPrice').textContent =
+                            `₹${Number(h.price).toLocaleString()} / month`;
+                    }
+                } catch (e) { /* ignore */ }
+            }
+        });
+    </script>
+</body>
+
+</html>
